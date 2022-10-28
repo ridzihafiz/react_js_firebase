@@ -1,0 +1,91 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+
+export default function Login() {
+  const navigate = useNavigate();
+
+  const handleGoogleLogin = () => {
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log(result.user);
+        localStorage.setItem("user", JSON.stringify(result.user));
+        navigate("/dashboard");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  const handleEmailPasswordLogin = (e) => {
+    e.preventDefault();
+
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email, password)
+      .then((result) => {
+        localStorage.setItem("user", JSON.stringify(result.user));
+        navigate("/dashboard");
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  return (
+    <main className=" w-screen min-h-screen flex flex-col bg-gradient-to-tr from-green-800 to-green-500 max-w-[500px] mx-auto p-10 ">
+      <form
+        className=" w-full bg-white flex flex-col gap-4 shadow-lg rounded-lg mt-8 p-6 "
+        autoComplete="off"
+        onSubmit={handleEmailPasswordLogin}
+      >
+        <h1 className=" text-4xl text-green-500 text-center ">Login</h1>
+        <div className=" flex flex-col gap-2 ">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            className=" h-10 px-3 rounded-md border-[1px] border-gray-300 "
+          />
+        </div>
+
+        <div className=" flex flex-col gap-2 ">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            className=" h-10 px-3 rounded-md border-[1px] border-gray-300 "
+          />
+        </div>
+
+        <div className=" mt-4 flex flex-col gap-2 "></div>
+        <button className=" h-10 w-full bg-green-500 text-white rounded-lg ">
+          Login
+        </button>
+        <button
+          className=" h-10 w-full bg-yellow-500 text-white rounded-lg "
+          type="button"
+          onClick={handleGoogleLogin}
+        >
+          Login with Google
+        </button>
+        <Link
+          to={"/register"}
+          className=" h-10 w-full bg-slate-500 text-white rounded-lg flex justify-center items-center "
+        >
+          Register
+        </Link>
+      </form>
+    </main>
+  );
+}
